@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breathing Exercise</title>
+    <style>
+        :root {
+            --bg-gradient-start: #2b5876;
+            --bg-gradient-end: #4e4376;
+            --bg-gradient-mid: #141e30;
+            --text-color: #ffffff;
+        }
+
+        body {
+            background: linear-gradient(-45deg, var(--bg-gradient-start), var(--bg-gradient-end), var(--bg-gradient-mid), #243b55);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .app-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            width: 300px;
+            margin-bottom: 10px;
+        }
+
+        /* The 3D nose model */
+        .nose-model {
+            position: absolute;
+            width: 120px;
+            height: 160px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 2;
+            transition: transform 5s ease-in-out;
+        }
+
+        .nose-model.expand { transform: scale(1.15); }
+        .nose-model.shrink { transform: scale(1); }
+
+        .nose-bridge {
+            position: absolute;
+            top: 0;
+            width: 50px;
+            height: 140px;
+            background: #e3a985;
+            border-radius: 30px;
+            box-shadow: 
+                inset -10px -10px 20px rgba(0,0,0,0.15), 
+                inset 10px 10px 20px rgba(255,255,255,0.6), 
+                0 15px 25px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+
+        .nostril {
+            position: absolute;
+            bottom: 20px;
+            width: 50px;
+            height: 50px;
+            background: #e3a985;
+            border-radius: 50%;
+            box-shadow: 
+                inset -10px -10px 20px rgba(0,0,0,0.2), 
+                inset 10px 10px 20px rgba(255,255,255,0.6), 
+                0 10px 15px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .nostril.left { left: 5px; }
+        .nostril.right { right: 5px; }
+
+        .hole {
+            position: absolute;
+            bottom: 10px;
+            width: 25px;
+            height: 15px;
+            background: #4a2f1d;
+            border-radius: 50%;
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.8);
+        }
+
+        .nostril.left .hole { left: 10px; transform: rotate(-15deg); }
+        .nostril.right .hole { right: 10px; transform: rotate(15deg); }
+
+        /* Air particles visualization */
+        .air-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(180, 230, 255, 0.8);
+            border-radius: 50%;
+            z-index: 3;
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(180, 230, 255, 0.8);
+        }
+
+        .instruction {
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 10px;
+            width: 44px;
+            height: 44px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: width 0.3s ease, padding 0.3s ease, background 0.3s ease;
+            cursor: pointer;
+            box-sizing: border-box;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .volume-container.expanded {
+            width: 160px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .volume-icon {
+            font-size: 1.2rem;
+            margin-right: 10px;
+            min-width: 24px;
+            text-align: center;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 120px;
+            background: transparent;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .timer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .timer-label {
+            font-size: 0.9rem;
+            margin-top: 5px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .lap-counter {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">Mindful Breathing</div>
+
+    <div class="app-container">
+        <div class="nose-model" id="nose">
+            <div class="nostril left"><div class="hole"></div></div>
+            <div class="nostril right"><div class="hole"></div></div>
+            <div class="nose-bridge"></div>
+        </div>
+    </div>
+
+    <div class="instruction" id="instruction">Ready?</div>
+
+    <div class="controls">
+        <button id="start-btn">Start</button>
+        <button id="end-btn" style="display: none;">End</button>
+    </div>
+
+    <div class="volume-container" id="volume-container">
+        <div class="volume-icon">🔊</div>
+        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
+    </div>
+
+    <div class="timer-container">
+        <div class="timer" id="timer">00:00</div>
+        <div class="timer-label">Timer</div>
+        <div class="lap-counter" id="lap-counter">Laps: 0</div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const nose = document.getElementById('nose');
+        const instruction = document.getElementById('instruction');
+        const startBtn = document.getElementById('start-btn');
+        const endBtn = document.getElementById('end-btn');
+        const timerDisplay = document.getElementById('timer');
+        const lapCounter = document.getElementById('lap-counter');
+        const appContainer = document.querySelector('.app-container');
+        const volumeSlider = document.getElementById('volume');
+        const volumeContainer = document.getElementById('volume-container');
+
+        // Timers and Intervals
+        let breathingInterval;
+        let timerInterval;
+        let timeout1, timeout2, timeout3, timeout4;
+        let seconds = 0;
+        let sessionState = 'idle'; // 'idle', 'breathing'
+        let lapCount = 0;
+        let particleInterval;
+        let audioCtx;
+        let masterGainNode;
+
+        // Breathing cycle durations (in milliseconds)
+        const breatheInTime = 5000;
+        const holdTime = 4000;
+        const breatheOutTime = 5000;
+        const holdOutTime = 4000;
+        const totalCycleTime = breatheInTime + holdTime + breatheOutTime + holdOutTime;
+
+        // Synthesize breathing sounds using Web Audio API
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                masterGainNode = audioCtx.createGain();
+                masterGainNode.gain.value = volumeSlider.value;
+                masterGainNode.connect(audioCtx.destination);
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        volumeContainer.addEventListener('click', (e) => {
+            if (e.target !== volumeSlider) {
+                volumeContainer.classList.toggle('expanded');
+            }
+        });
+
+        volumeSlider.addEventListener('input', (e) => {
+            if (masterGainNode) {
+                masterGainNode.gain.value = e.target.value;
+            }
+        });
+
+        function playBreathSound(type, durationMs) {
+            if (!audioCtx) return;
+            const bufferSize = audioCtx.sampleRate * (durationMs / 1000);
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            // Generate white noise pattern
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noiseSource = audioCtx.createBufferSource();
+            noiseSource.buffer = buffer;
+            
+            // Filter to simulate breath characteristics
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = type === 'in' ? 'bandpass' : 'lowpass';
+            filter.frequency.value = type === 'in' ? 800 : 400;
+            filter.Q.value = 0.5;
+
+            // Envelope to fade the breath sound in and out smoothly
+            const peakVolume = type === 'in' ? 0.05 : 0.8;
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(peakVolume, audioCtx.currentTime + 1.5);
+            gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + (durationMs / 1000));
+
+            noiseSource.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(masterGainNode);
+            noiseSource.start();
+        }
+
+        // Generate air visualization particles
+        function startParticles(type) {
+            clearInterval(particleInterval);
+            particleInterval = setInterval(() => {
+                const particle = document.createElement('div');
+                particle.className = 'air-particle';
+                
+                const isLeft = Math.random() > 0.5;
+                const offsetX = isLeft ? -30 : 30; 
+                const spread = (Math.random() - 0.5) * 15;
+                
+                particle.style.left = `calc(50% + ${offsetX + spread}px)`;
+                appContainer.appendChild(particle);
+
+                const duration = 1200 + Math.random() * 800;
+                
+                if (type === 'in') {
+                    particle.style.bottom = '10px';
+                    particle.animate([
+                        { transform: 'translateY(0) scale(0.5)', opacity: 0 },
+                        { opacity: 1, offset: 0.6 },
+                        { transform: 'translateY(-80px) scale(1.2)', opacity: 0 }
+                    ], { duration, easing: 'ease-in' }).onfinish = () => particle.remove();
+                } else {
+                    particle.style.bottom = '90px';
+                    particle.animate([
+                        { transform: 'translateY(0) scale(1.2)', opacity: 0 },
+                        { opacity: 1, offset: 0.3 },
+                        { transform: 'translateY(80px) scale(0.5)', opacity: 0 }
+                    ], { duration, easing: 'ease-out' }).onfinish = () => particle.remove();
+                }
+            }, 80);
+        }
+
+        function stopParticles() {
+            clearInterval(particleInterval);
+        }
+
+        // Smoothly update instruction text
+        function setInstruction(text) {
+            instruction.style.opacity = '0';
+            instruction.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                instruction.innerText = text;
+                instruction.style.opacity = '1';
+                instruction.style.transform = 'translateY(0)';
+            }, 300);
+        }
+
+        // Core animation logic
+        function breathingAnimation() {
+            // 1. Breathe In
+            setInstruction('Breathe In');
+            nose.className = 'nose-model expand';
+            startParticles('in');
+            playBreathSound('in', breatheInTime);
+
+            // 2. Hold
+            timeout1 = setTimeout(() => {
+                setInstruction('Hold');
+                stopParticles();
+                
+                // 3. Breathe Out
+                timeout2 = setTimeout(() => {
+                    setInstruction('Breathe Out');
+                    nose.className = 'nose-model shrink';
+                    startParticles('out');
+                    playBreathSound('out', breatheOutTime);
+
+                    // 4. Second Hold
+                    timeout3 = setTimeout(() => {
+                        setInstruction('Hold');
+                        stopParticles();
+                        
+                        // 5. End of round
+                        timeout4 = setTimeout(() => {
+                            lapCount++;
+                            lapCounter.innerText = `Laps: ${lapCount}`;
+                        }, holdOutTime);
+                    }, breatheOutTime);
+                }, holdTime);
+
+            }, breatheInTime);
+        }
+
+        function formatTime(totalSeconds) {
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function endSession() {
+            // Toggle buttons
+            endBtn.style.display = 'none';
+            startBtn.style.display = 'inline-block';
+            
+            // Clear all running loops and scheduled timeouts
+            clearInterval(breathingInterval);
+            clearInterval(timerInterval);
+            clearTimeout(timeout1);
+            clearTimeout(timeout2);
+            clearTimeout(timeout3);
+            clearTimeout(timeout4);
+            stopParticles();
+            document.querySelectorAll('.air-particle').forEach(p => p.remove());
+            
+            // Reset UI to default state
+            setInstruction('Ready?');
+            nose.className = 'nose-model';
+            sessionState = 'idle';
+            timerDisplay.innerText = '00:00';
+            document.querySelector('.timer-label').innerText = 'Timer';
+            lapCount = 0;
+            lapCounter.innerText = 'Laps: 0';
+        }
+
+        // Timer update logic
+        function updateTimer() {
+            if (sessionState === 'breathing') {
+                seconds++;
+                timerDisplay.innerText = formatTime(seconds);
+            }
+        }
+
+        // Start button event
+        startBtn.addEventListener('click', () => {
+            initAudio(); // Required to unlock sound features in modern browsers
+            // Toggle buttons
+            startBtn.style.display = 'none';
+            endBtn.style.display = 'inline-block';
+            
+            // Reset timer and laps
+            seconds = 0;
+            lapCount = 0;
+            lapCounter.innerText = 'Laps: 0';
+            sessionState = 'breathing';
+            timerDisplay.innerText = '00:00';
+            document.querySelector('.timer-label').innerText = 'Timer';
+            
+            // Trigger first breath immediately, then loop
+            breathingAnimation();
+            breathingInterval = setInterval(breathingAnimation, totalCycleTime);
+            
+            // Start the timer clock
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        });
+
+        // End button event
+        endBtn.addEventListener('click', endSession);
+    </script>
+</body>
+</html>
