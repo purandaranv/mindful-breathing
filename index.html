@@ -23,6 +23,7 @@
             align-items: center;
             justify-content: space-around;
             height: 100vh;
+            height: 100dvh;
             width: 100vw;
             margin: 0;
             padding: 10px;
@@ -326,17 +327,28 @@
         /* Mobile devices */
         @media (max-width: 480px) {
             body {
-                padding: 8px;
-                justify-content: space-between;
+                padding: 30px 15px;
+                justify-content: space-evenly;
+            }
+
+            .header {
+                font-size: 1.8rem;
             }
 
             .controls {
-                gap: 0.4rem;
+                width: 100%;
             }
 
             button {
-                flex: 1;
-                min-width: 70px;
+                width: 75%;
+                max-width: 250px;
+                padding: 16px 24px;
+                font-size: 1.2rem;
+                border-radius: 40px;
+            }
+            
+            .volume-container.expanded {
+                width: 220px;
             }
         }
     </style>
