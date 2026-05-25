@@ -21,10 +21,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            justify-content: space-around;
+            height: 100vh;
+            width: 100vw;
             margin: 0;
+            padding: 10px;
             overflow: hidden;
+            box-sizing: border-box;
         }
 
         @keyframes gradientBG {
@@ -34,10 +37,11 @@
         }
 
         .header {
-            margin-bottom: 10px;
-            font-size: 1.5rem;
+            margin: 0;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
             font-weight: 300;
             letter-spacing: 2px;
+            text-align: center;
         }
 
         .app-container {
@@ -45,9 +49,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 300px;
-            width: 300px;
-            margin-bottom: 10px;
+            height: clamp(140px, 25vw, 220px);
+            width: clamp(140px, 25vw, 220px);
+            margin: 0;
+            flex-shrink: 0;
         }
 
         /* The 3D nose model */
@@ -122,18 +127,21 @@
         }
 
         .instruction {
-            margin-bottom: 30px;
-            font-size: 2rem;
+            margin: 0;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
             font-weight: bold;
             text-align: center;
             text-shadow: 0px 2px 4px rgba(0,0,0,0.2);
             transition: opacity 0.3s ease, transform 0.3s ease;
+            min-height: 1.5rem;
         }
 
         .controls {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: clamp(0.5rem, 1vw, 0.8rem);
+            justify-content: center;
+            margin: 0;
         }
 
         button {
@@ -142,13 +150,14 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            padding: 12px 30px;
-            font-size: 1.1rem;
+            padding: clamp(8px, 1.5vw, 10px) clamp(18px, 3vw, 24px);
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
             font-weight: bold;
             border-radius: 30px;
             cursor: pointer;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         button:hover {
@@ -165,41 +174,61 @@
         .volume-container {
             display: flex;
             align-items: center;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            justify-content: flex-start;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-radius: 30px;
-            padding: 10px;
-            width: 44px;
-            height: 44px;
-            margin-bottom: 20px;
+            padding: 4px;
+            width: 36px;
+            height: 36px;
+            margin: 0 auto;
             overflow: hidden;
-            transition: width 0.3s ease, padding 0.3s ease, background 0.3s ease;
+            transition: all 0.3s ease;
             cursor: pointer;
             box-sizing: border-box;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
         }
 
         .volume-container.expanded {
-            width: 160px;
-            padding: 10px 15px;
-            background: rgba(255, 255, 255, 0.2);
+            width: 150px;
+            padding: 4px 12px 4px 8px;
+            background: rgba(0, 0, 0, 0.35);
         }
 
         .volume-icon {
-            font-size: 1.2rem;
-            margin-right: 10px;
-            min-width: 24px;
-            text-align: center;
             user-select: none;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            background: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(255,255,255,0.6);
+            font-size: 14px;
+            line-height: 1;
         }
 
         input[type="range"] {
             -webkit-appearance: none;
-            width: 120px;
+            width: clamp(60px, 18vw, 100px);
             background: transparent;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            height: 18px;
+            outline: none;
+        }
+
+        .volume-container.expanded input[type="range"] {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         input[type="range"]::-webkit-slider-thumb {
@@ -211,6 +240,11 @@
             cursor: pointer;
             margin-top: -6px;
             box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
         }
 
         input[type="range"]::-webkit-slider-runnable-track {
@@ -221,42 +255,89 @@
             border-radius: 2px;
         }
 
+        input[type="range"]::-moz-range-thumb {
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        input[type="range"]::-moz-range-track {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            border: none;
+        }
+
         .timer-container {
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: clamp(0.4rem, 1vw, 0.8rem);
+            width: 100%;
+            margin: 0;
         }
 
         .timer {
-            font-size: 2rem;
+            font-size: clamp(1.2rem, 3.5vw, 1.6rem);
             font-family: monospace;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-            padding: 10px 20px;
-            border-radius: 10px;
+            padding: clamp(6px, 1vw, 8px) clamp(12px, 2vw, 16px);
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+            white-space: nowrap;
         }
 
         .timer-label {
-            font-size: 0.9rem;
-            margin-top: 5px;
+            font-size: clamp(0.7rem, 1.5vw, 0.8rem);
             opacity: 0.8;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin: 0;
         }
 
         .lap-counter {
-            margin-top: 15px;
-            font-size: 1.2rem;
+            font-size: clamp(0.9rem, 2vw, 1rem);
             font-family: monospace;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 20px;
-            border-radius: 10px;
+            padding: clamp(6px, 1vw, 8px) clamp(12px, 2vw, 16px);
+            border-radius: 8px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             letter-spacing: 1px;
+            text-align: center;
+            min-width: 110px;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        /* Mobile devices */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+                justify-content: space-between;
+            }
+
+            .controls {
+                gap: 0.4rem;
+            }
+
+            button {
+                flex: 1;
+                min-width: 70px;
+            }
         }
     </style>
 </head>
@@ -312,6 +393,7 @@
         let particleInterval;
         let audioCtx;
         let masterGainNode;
+        let currentBreathSource;
 
         // Breathing cycle durations (in milliseconds)
         const breatheInTime = 5000;
@@ -325,7 +407,7 @@
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 masterGainNode = audioCtx.createGain();
-                masterGainNode.gain.value = volumeSlider.value;
+                masterGainNode.gain.value = parseFloat(volumeSlider.value);
                 masterGainNode.connect(audioCtx.destination);
             }
             if (audioCtx.state === 'suspended') {
@@ -341,13 +423,18 @@
 
         volumeSlider.addEventListener('input', (e) => {
             if (masterGainNode) {
-                masterGainNode.gain.value = e.target.value;
+                masterGainNode.gain.value = parseFloat(e.target.value);
             }
         });
 
         function playBreathSound(type, durationMs) {
             if (!audioCtx) return;
-            const bufferSize = audioCtx.sampleRate * (durationMs / 1000);
+            
+            if (currentBreathSource) {
+                try { currentBreathSource.stop(); } catch(e) {}
+            }
+            
+            const bufferSize = Math.floor(audioCtx.sampleRate * (durationMs / 1000));
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
             
@@ -357,6 +444,7 @@
             }
             const noiseSource = audioCtx.createBufferSource();
             noiseSource.buffer = buffer;
+            currentBreathSource = noiseSource;
             
             // Filter to simulate breath characteristics
             const filter = audioCtx.createBiquadFilter();
@@ -365,7 +453,7 @@
             filter.Q.value = 0.5;
 
             // Envelope to fade the breath sound in and out smoothly
-            const peakVolume = type === 'in' ? 0.05 : 0.8;
+            const peakVolume = type === 'in' ? 0.05 : 0.08;
             const gainNode = audioCtx.createGain();
             gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
             gainNode.gain.linearRampToValueAtTime(peakVolume, audioCtx.currentTime + 1.5);
@@ -482,6 +570,10 @@
             clearTimeout(timeout4);
             stopParticles();
             document.querySelectorAll('.air-particle').forEach(p => p.remove());
+            
+            if (currentBreathSource) {
+                try { currentBreathSource.stop(); } catch(e) {}
+            }
             
             // Reset UI to default state
             setInstruction('Ready?');
